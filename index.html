@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>बाल संसद चुनाव - Implementation Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Noto Sans Devanagari', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .presentation {
+            width: 90%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .slide {
+            display: none;
+            padding: 40px;
+            min-height: 600px;
+            position: relative;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .slide h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+
+        .slide h2 {
+            color: #e74c3c;
+            font-size: 2rem;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .slide h3 {
+            color: #27ae60;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            margin-top: 25px;
+        }
+
+        .slide p, .slide li {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .slide ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        .slide li {
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            background: #f39c12;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .warning {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .success {
+            background: #27ae60;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .info {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            padding: 15px 25px;
+            border-radius: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #2980b9;
+        }
+
+        .nav-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            color: white;
+            font-weight: bold;
+        }
+
+        .step-box {
+            background: #ecf0f1;
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .step-number {
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .device-card {
+            background: #f8f9fa;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .device-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .flow-diagram {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px;
+            min-width: 150px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .arrow {
+            font-size: 2rem;
+            color: #e74c3c;
+            margin: 0 10px;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 20px;
+                min-height: 500px;
+            }
+            
+            .slide h1 {
+                font-size: 2rem;
+            }
+            
+            .slide h2 {
+                font-size: 1.5rem;
+            }
+            
+            .slide p, .slide li {
+                font-size: 1rem;
+            }
+            
+            .flow-diagram {
+                flex-direction: column;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <h1>🗳️ बाल संसद चुनाव</h1>
+            <h2>Children's Parliament Election System</h2>
+            
+            <div style="text-align: center; margin: 50px 0;">
+                <div style="font-size: 4rem; margin-bottom: 30px;">
+                    📊 🗳️ 🧾
+                </div>
+                <p style="font-size: 1.5rem; color: #7f8c8d;">
+                    मोबाइल आधारित इलेक्ट्रॉनिक वोटिंग सिस्टम
+                </p>
+                <p style="font-size: 1.3rem; color: #7f8c8d;">
+                    Mobile-Based Electronic Voting System
+                </p>
+            </div>
+            
+            <div class="info">
+                ✨ इंटरनेट की आवश्यकता नहीं - केवल WiFi डॉन्गल से काम करता है
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <p><strong>Implementation Guide</strong></p>
+                <p>स्कूलों के लिए संपूर्ण सेटअप गाइड</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: System Overview -->
+        <div class="slide">
+            <h1>📋 सिस्टम अवलोकन</h1>
+            
+            <h3>🎯 मुख्य विशेषताएं:</h3>
+            <ul>
+                <li><span class="highlight">FLC (First Level Checking)</span> - डेटा क्लियरेंस</li>
+                <li><span class="highlight">8 Candidate Symbols</span> - स्वचालित symbol allocation</li>
+                <li><span class="highlight">NOTA</span> - स्वचालित रूप से जोड़ा जाता है</li>
+                <li><span class="highlight">Sealing Process</span> - वीडियो के साथ</li>
+                <li><span class="highlight">VVPAT</span> - Paper trail verification</li>
+                <li><span class="highlight">Excel Export</span> - पूर्ण results के साथ</li>
+            </ul>
+
+            <div class="device-grid">
+                <div class="device-card">
+                    <div class="device-icon">📊</div>
+                    <h4>Control Unit</h4>
+                    <p>चुनाव प्रबंधन<br/>Results & Export</p>
+                </div>
+                <div class="device-card">
+                    <div class="device-icon">🗳️</div>
+                    <h4>EVM Machine</h4>
+                    <p>वोटिंग इंटरफेस<br/>Candidate Management</p>
+                </div>
+                <div class="device-card">
+                    <div class="device-icon">🧾</div>
+                    <h4>VVPAT Unit</h4>
+                    <p>Vote Verification<br/>Paper Trail</p>
+                </div>
+            </div>
+
+            <div class="success">
+                ✅ भारतीय चुनाव प्रक्रिया का पूर्ण अनुकरण
+            </div>
+        </div>
+
+        <!-- Slide 3: Hardware Requirements -->
+        <div class="slide">
+            <h1>🖥️ हार्डवेयर आवश्यकताएं</h1>
+            
+            <div class="step-box">
+                <h3>📱 आवश्यक डिवाइस:</h3>
+                <ul>
+                    <li><strong>1 PC/Laptop</strong> - Server के लिए (Windows/Mac/Linux)</li>
+                    <li><strong>3 Mobile Devices</strong> - Android/iPhone कोई भी</li>
+                    <li><strong>1 WiFi Dongle</strong> - Airtel 5G/4G या कोई भी</li>
+                    <li><strong>Power Supply</strong> - सभी devices के लिए</li>
+                </ul>
+            </div>
+
+            <div class="step-box">
+                <h3>💻 PC/Laptop आवश्यकताएं:</h3>
+                <ul>
+                    <li><strong>Operating System:</strong> Windows 7+, macOS 10.12+, Ubuntu 16+</li>
+                    <li><strong>RAM:</strong> कम से कम 4GB</li>
+                    <li><strong>Storage:</strong> 1GB free space</li>
+                    <li><strong>WiFi:</strong> WiFi capability</li>
+                </ul>
+            </div>
+
+            <div class="warning">
+                ⚠️ महत्वपूर्ण: Setup के लिए internet जरूरी है, Election के लिए नहीं!
+            </div>
+
+            <div class="info">
+                💡 सभी mobile devices में browser होना चाहिए (Chrome, Safari, Firefox कोई भी)
+            </div>
+        </div>
+
+        <!-- Slide 4: Network Setup -->
+        <div class="slide">
+            <h1>🌐 Setup Process (दो चरण)</h1>
+            
+            <div class="info">
+                📋 यह process दो भागों में होगी - पहले internet के साथ setup, फिर election के दौरान internet बंद
+            </div>
+            
+            <h3>🔧 चरण 1: Setup Phase (Internet Required)</h3>
+            <div class="step-box">
+                <div><span class="step-number">1</span><strong>WiFi dongle को internet के साथ चलाएं</strong> (data cable connected)</div>
+                <div><span class="step-number">2</span><strong>PC/Laptop को internet से connect करें</strong></div>
+                <div><span class="step-number">3</span><strong>Node.js download और install करें</strong></div>
+                <div><span class="step-number">4</span><strong>Project files shared link से download करें</strong></div>
+                <div><span class="step-number">5</span><strong>NPM dependencies install करें</strong></div>
+                <div><span class="step-number">6</span><strong>System test करें</strong></div>
+            </div>
+
+            <h3>🗳️ चरण 2: Election Phase (Internet-Less)</h3>
+            <div class="step-box">
+                <div><span class="step-number">1</span><strong>WiFi dongle से data cable disconnect करें</strong></div>
+                <div><span class="step-number">2</span><strong>सभी mobiles में mobile data OFF करें</strong></div>
+                <div><span class="step-number">3</span><strong>सभी devices को dongle के WiFi से connect करें</strong></div>
+                <div><span class="step-number">4</span><strong>Server start करें और election चलाएं</strong></div>
+            </div>
+
+            <div class="warning">
+                ⚠️ पहले पूरा setup internet के साथ करें, फिर election के समय internet disconnect करें!
+            </div>
+
+            <div style="text-align: center; margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h4>Process Flow:</h4>
+                <div style="font-size: 1.5rem; margin: 20px 0;">
+                    🌐 Internet Setup → 🔧 Complete Installation → 📡 Disconnect Internet → 🗳️ Run Election
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Server Installation -->
+        <div class="slide">
+            <h1>⚙️ Server Installation (Internet के साथ)</h1>
+            
+            <div class="info">
+                🌐 यह step setup phase में करना है - जब internet connected हो
+            </div>
+            
+            <h3>📥 Step 1: Node.js Install करें</h3>
+            <div class="step-box">
+                <div><span class="step-number">1</span><strong>Internet connection ensure करें</strong></div>
+                <div><span class="step-number">2</span><strong>Website visit करें:</strong> <span class="highlight">nodejs.org</span></div>
+                <div><span class="step-number">3</span><strong>"Download" button click करें</strong></div>
+                <div><span class="step-number">4</span><strong>Downloaded file को run करके install करें</strong></div>
+                <div><span class="step-number">5</span><strong>Installation complete होने तक wait करें</strong></div>
+            </div>
+
+            <h3>✅ Installation Check करें:</h3>
+            <div class="code-block">
+Windows: Command Prompt खोलें (Win + R, type "cmd")
+Mac/Linux: Terminal खोलें
+
+Type करें:
+node --version
+npm --version
+
+अगर version numbers दिखें तो installation successful है!
+            </div>
+
+            <div class="warning">
+                ⚠️ Node.js installation के लिए internet connection जरूरी है!
+            </div>
+
+            <div class="success">
+                ✅ एक बार install हो जाए तो फिर offline काम करता है
+            </div>
+        </div>
+
+        <!-- Slide 6: Project Setup -->
+        <div class="slide">
+            <h1>📁 Project Setup (Internet के साथ)</h1>
+            
+            <div class="info">
+                🌐 यह भी setup phase में करना है - internet connected state में
+            </div>
+            
+            <h3>📂 Folder बनाएं:</h3>
+            <div class="step-box">
+                <div><span class="step-number">1</span><strong>Desktop पर folder बनाएं:</strong> "election-system"</div>
+                <div><span class="step-number">2</span><strong>इस folder को Command Prompt/Terminal में open करें</strong></div>
+            </div>
+
+            <h3>📄 Files Download करें:</h3>
+            <div class="info">
+                📁 सभी required files (server.js, package.json, index.html) आपको link से मिल जाएंगी
+            </div>
+            
+            <div class="step-box">
+                <div><span class="step-number">1</span><strong>Internet connection ensure करें</strong></div>
+                <div><span class="step-number">2</span><strong>Shared link से सभी files download करें</strong></div>
+                <div><span class="step-number">3</span><strong>Files को election-system folder में copy करें</strong></div>
+                <div><span class="step-number">4</span><strong>File structure verify करें:</strong></div>
+            </div>
+
+            <div class="code-block">
+election-system/
+├── server.js          (Main server file)
+├── package.json       (Dependencies)
+└── public/
+    └── index.html     (Web interface)
+            </div>
+
+            <h3>🔧 Dependencies install करें:</h3>
+            <div class="step-box">
+                <div><span class="step-number">1</span><strong>Command Prompt में folder खोलें</strong></div>
+                <div><span class="step-number">2</span><strong>Internet connected होना चाहिए</strong></div>
+                <div><span class="step-number">3</span><strong>यह command type करें:</strong></div>
+            </div>
+            
+            <div class="code-block">
+npm install express socket.io xlsx
+            </div>
+
+            <div class="warning">
+                ⚠️ NPM install के लिए भी internet connection जरूरी है!
+            </div>
+
+            <div class="success">
+                ✅ एक बार install हो जाए तो system offline चल जाता है
+            </div>
+        </div>
+
+        <!-- Slide 7: Running Server -->
+        <div class="slide">
+            <h1>🚀 Election Phase शुरू करना</h1>
+            
+            <div class="success">
+                ✅ Setup complete! अब internet disconnect करके election चला सकते हैं
+            </div>
+
+            <h3>🌐 Internet Disconnect करें:</h3>
+            <div class="step-box">
+                <div><span class="step-number">1</span><strong>WiFi dongle से data cable disconnect करें</strong></div>
+                <div><span class="step-number">2</span><strong>सभी mobiles में mobile data OFF करें</strong></div>
+                <div><span class="step-number">3</span><strong>सभी devices को dongle के WiFi network से connect करें</strong></div>
+            </div>
+            
+            <h3>▶️ Server Start करें:</h3>
+            <div class="step-box">
+                <div><span class="step-number">1</span><strong>Command Prompt में project folder खोलें</strong></div>
+                <div><span class="step-number">2</span><strong>यह command type करें:</strong></div>
+            </div>
+
+            <div class="code-block">
+node server.js
+            </div>
+
+            <h3>📝 Important Information देखें:</h3>
+            <div class="step-box">
+                <p>Server start होने पर screen पर दिखेगा:</p>
+                <div class="code-block">
+🗳️ बाल संसद चुनाव Server running on port 3000
+📱 Connect devices to: http://192.168.1.100:3000
+
+🔐 Device Authentication Keys:
+Control Unit: CTRL_abc123def456
+EVM: EVM_xyz789ghi012  
+VVPAT: VVPAT_mno345pqr678
+                </div>
+            </div>
+
+            <div class="info">
+                💡 अब system पूरी तरह offline है - कोई internet dependency नहीं!
+            </div>
+
+            <div class="warning">
+                ⚠️ यह IP address और Authentication Keys को note कर लें!
+            </div>
+        </div>
+
+        <!-- Slide 8: Mobile Connection -->
+        <div class="slide">
+            <h1>📱 Mobile Devices की तैयारी</h1>
+            
+            <h3>🔧 Mobile Settings (बहुत महत्वपूर्ण!):</h3>
+            <div class="warning">
+                ⚠️ Election process शुरू करने से पहले यह settings जरूर करें!
+            </div>
+            
+            <div class="step-box">
+                <div><span class="step-number">1</span><strong>Notifications बंद करें:</strong></div>
+                <ul>
+                    <li><strong>Android:</strong> Settings → Apps & Notifications → Do Not Disturb ON</li>
+                    <li><strong>iPhone:</strong> Settings → Do Not Disturb → ON</li>
+                    <li>या Silent mode ON करें</li>
+                </ul>
+            </div>
+
+            <div class="step-box">
+                <div><span class="step-number">2</span><strong>Screen Lock/Auto Sleep बंद करें:</strong></div>
+                <ul>
+                    <li><strong>Android:</strong> Settings → Display → Screen timeout → Never</li>
+                    <li><strong>iPhone:</strong> Settings → Display & Brightness → Auto-Lock → Never</li>
+                    <li>Battery में power saving mode OFF करें</li>
+                </ul>
+            </div>
+
+            <div class="step-box">
+                <div><span class="step-number">3</span><strong>Browser में connection:</strong></div>
+                <div><span class="step-number">4</span><strong>Address bar में type करें:</strong></div>
+                <div class="code-block">http://192.168.1.100:3000
+(यहाँ अपना actual IP address use करें)</div>
+                <div><span class="step-number">5</span><strong>Role select करें और authentication key enter करें</strong></div>
+            </div>
+
+            <h3>🔐 Authentication Keys:</h3>
+            <div class="device-grid">
+                <div class="device-card">
+                    <div class="device-icon">📊</div>
+                    <h4>Mobile 1</h4>
+                    <p>Role: Control Unit<br/>Key: CTRL_xxxxxxxx</p>
+                </div>
+                <div class="device-card">
+                    <div class="device-icon">🗳️</div>
+                    <h4>Mobile 2</h4>
+                    <p>Role: EVM<br/>Key: EVM_xxxxxxxx</p>
+                </div>
+                <div class="device-card">
+                    <div class="device-icon">🧾</div>
+                    <h4>Mobile 3</h4>
+                    <p>Role: VVPAT<br/>Key: VVPAT_xxxxxxxx</p>
+                </div>
+            </div>
+
+            <div class="info">
+                💡 Screen lock बंद न करने पर voting के बीच में screen off हो सकती है!
+            </div>
+        </div>
+
+        <!-- Slide 9: Election Process -->
+        <div class="slide">
+            <h1>🗳️ Complete Process Flow</h1>
+            
+            <h3>📋 Phase 1: Setup (Internet के साथ)</h3>
+            <div class="flow-diagram">
+                <div class="flow-step">Node.js Install</div>
+                <div class="arrow">→</div>
+                <div class="flow-step">Files Download</div>
+                <div class="arrow">→</div>
+                <div class="flow-step">NPM Install</div>
+            </div>
+            
+            <h3>📋 Phase 2: Election (Internet बंद)</h3>
+            <div class="flow-diagram">
+                <div class="flow-step">Internet Disconnect</div>
+                <div class="arrow">→</div>
+                <div class="flow-step">Server Start</div>
+                <div class="arrow">→</div>
+                <div class="flow-step">Mobile Connect</div>
+            </div>
+            
+            <div class="flow-diagram">
+                <div class="flow-step">EVM: FLC & Setup</div>
+                <div class="arrow">→</div>
+                <div class="flow-step">Candidates Add</div>
+                <div class="arrow">→</div>
+                <div class="flow-step">Control: Sealing</div>
+            </div>
+
+            <div class="flow-diagram">
+                <div class="flow-step">Polling Process</div>
+                <div class="arrow">→</div>
+                <div class="flow-step">Election Over</div>
+                <div class="arrow">→</div>
+                <div class="flow-step">Results Export</div>
+            </div>
+
+            <div class="warning">
+                ⚠️ Phase 1 में internet जरूरी है, Phase 2 में internet बंद रखें
+            </div>
+
+            <div class="success">
+                ✅ एक बार setup हो जाए तो हमेशा offline use कर सकते हैं
+            </div>
+        </div>
+
+        <!-- Slide 10: Troubleshooting -->
+        <div class="slide">
+            <h1>🔧 समस्या निवारण</h1>
+            
+            <h3>❌ Common Problems & Solutions:</h3>
+            
+            <div class="step-box">
+                <strong>Problem 1: Node.js command not found</strong>
+                <ul>
+                    <li>Node.js को पूरी तरह uninstall करें</li>
+                    <li>Computer restart करें</li>
+                    <li>nodejs.org से latest version download करें</li>
+                    <li>Administrator के रूप में install करें</li>
+                </ul>
+            </div>
+
+            <div class="step-box">
+                <strong>Problem 2: Mobile connect नहीं हो रहा</strong>
+                <ul>
+                    <li>सभी devices same WiFi network पर हैं या नहीं check करें</li>
+                    <li>Mobile data OFF है या नहीं verify करें</li>
+                    <li>PC का IP address सही है या नहीं check करें</li>
+                    <li>WiFi dongle restart करें</li>
+                </ul>
+            </div>
+
+            <div class="step-box">
+                <strong>Problem 3: Authentication failed</strong>
+                <ul>
+                    <li>Server console से correct authentication key copy करें</li>
+                    <li>Extra spaces नहीं होना चाहिए</li>
+                    <li>Capital letters correctly type करें</li>
+                </ul>
+            </div>
+
+            <div class="step-box">
+                <strong>Problem 4: Election process में interruption</strong>
+                <ul>
+                    <li><strong>Notifications OFF</strong> हैं या नहीं check करें</li>
+                    <li><strong>Screen lock disable</strong> है या नहीं verify करें</li>
+                    <li>Battery saver mode OFF करें</li>
+                    <li>Browser को foreground में रखें</li>
+                </ul>
+            </div>
+
+            <div class="warning">
+                ⚠️ अगर voting के बीच में screen lock हो जाए तो connection टूट सकती है!
+            </div>
+
+            <div class="info">
+                💡 IP Address check करने के लिए: Windows में "ipconfig", Mac/Linux में "ifconfig" command use करें
+            </div>
+        </div>
+
+        <!-- Slide 11: Tips & Best Practices -->
+        <div class="slide">
+            <h1>💡 Tips & Best Practices</h1>
+            
+            <h3>✅ सफल Implementation के लिए:</h3>
+            <div class="step-box">
+                <div><span class="step-number">1</span><strong>Testing:</strong> Election से पहले पूरा system test करें</div>
+                <div><span class="step-number">2</span><strong>Backup:</strong> Authentication keys को safe जगह save करें</div>
+                <div><span class="step-number">3</span><strong>Power:</strong> सभी devices को power connected रखें</div>
+                <div><span class="step-number">4</span><strong>Training:</strong> Operators को पहले training दें</div>
+            </div>
+
+            <h3>🎯 Election Day Checklist:</h3>
+            
+            <h4>📋 Pre-Election (Setup Phase - Internet Required):</h4>
+            <ul>
+                <li>✅ Node.js installed on PC</li>
+                <li>✅ Project files downloaded from shared link</li>
+                <li>✅ NPM dependencies installed</li>
+                <li>✅ System tested once with internet</li>
+            </ul>
+
+            <h4>📋 Election Day (Offline Phase):</h4>
+            <ul>
+                <li>✅ WiFi dongle working, <strong>data cable disconnected</strong></li>
+                <li>✅ PC/Laptop charged और server running</li>
+                <li>✅ सभी 3 mobiles connected और authenticated</li>
+                <li>✅ <strong>सभी mobiles में notifications OFF</strong></li>
+                <li>✅ <strong>सभी mobiles में screen lock/auto sleep OFF</strong></li>
+                <li>✅ <strong>Mobile data OFF, केवल WiFi ON</strong></li>
+                <li>✅ Sealing video ready (अगर है तो)</li>
+                <li>✅ Candidates list और institution details ready</li>
+                <li>✅ Backup power arrangement</li>
+            </ul>
+
+            <div class="warning">
+                ⚠️ महत्वपूर्ण: Election के दौरान कोई भी mobile को disturb न करें - notifications या screen lock से process रुक सकती है!
+            </div>
+
+            <div class="success">
+                🎉 System completely offline काम करता है - कोई internet dependency नहीं!
+            </div>
+
+            <div class="info">
+                📊 Results automatically Excel format में export हो जाते हैं institution details के साथ
+            </div>
+        </div>
+
+        <!-- Slide 12: Contact & Support -->
+        <div class="slide">
+            <h1>📞 Support & Contact</h1>
+            
+            <h3>🆘 यदि कोई समस्या आए:</h3>
+            <div class="step-box">
+                <div><span class="step-number">1</span><strong>Error messages को screenshot लें</strong></div>
+                <div><span class="step-number">2</span><strong>Network connectivity check करें</strong></div>
+                <div><span class="step-number">3</span><strong>Server restart करके try करें</strong></div>
+                <div><span class="step-number">4</span><strong>WiFi dongle restart करें</strong></div>
+            </div>
+
+            <div style="text-align: center; margin: 50px 0;">
+                <h2>🎉 धन्यवाद!</h2>
+                <h3>बाल संसद चुनाव सफल हो!</h3>
+                
+                <div style="margin: 30px 0; padding: 30px; background: #f8f9fa; border-radius: 15px;">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">
+                        🗳️ 📊 🧾
+                    </div>
+                    <p style="font-size: 1.3rem; color: #2c3e50;">
+                        <strong>सभी features implemented:</strong><br/>
+                        FLC, Sealing, VVPAT, Excel Export<br/>
+                        Hindi Interface with Authentic Indian Election Experience
+                    </p>
+                </div>
+            </div>
+
+            <div class="success">
+                ✨ यह system पूरी तरह offline काम करता है और बच्चों के लिए educational है!
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">⬅️ Previous</button>
+        <span class="slide-counter">
+            <span id="currentSlide">1</span> / <span id="totalSlides">12</span>
+        </span>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Next ➡️</button>
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            
+            document.getElementById('currentSlide').textContent = index + 1;
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            const newIndex = currentSlideIndex + direction;
+            
+            if (newIndex >= 0 && newIndex < totalSlides) {
+                currentSlideIndex = newIndex;
+                showSlide(currentSlideIndex);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight' || event.key === ' ') {
+                changeSlide(1);
+            } else if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            }
+        });
+
+        // Initialize
+        showSlide(currentSlideIndex);
+    </script>
+</body>
+</html>
